@@ -7,6 +7,33 @@
 </head>
 <body>
     <h1>Closest Distance</h1>
+
+    <!-- Form to add address to array 1 -->
+    <h2>Add Address to Array 1</h2>
+    <form id="add-address-array1">
+        <label for="address-name-array1">Address Name:</label>
+        <input type="text" id="address-name-array1" name="address-name-array1" required><br>
+        <label for="latitude-array1">Latitude:</label>
+        <input type="number" id="latitude-array1" name="latitude-array1" step="any" required><br>
+        <label for="longitude-array1">Longitude:</label>
+        <input type="number" id="longitude-array1" name="longitude-array1" step="any" required><br>
+        <button type="submit">Add Address</button>
+    </form>
+
+    <!-- Form to add address to array 2 -->
+    <h2>Add Address to Array 2</h2>
+    <form id="add-address-array2">
+        <label for="address-name-array2">Address Name:</label>
+        <input type="text" id="address-name-array2" name="address-name-array2" required><br>
+        <label for="latitude-array2">Latitude:</label>
+        <input type="number" id="latitude-array2" name="latitude-array2" step="any" required><br>
+        <label for="longitude-array2">Longitude:</label>
+        <input type="number" id="longitude-array2" name="longitude-array2" step="any" required><br>
+        <button type="submit">Add Address</button>
+    </form>
+
+    <!-- List to display closest distances -->
+    <h2>Closest Distances</h2>
     <ul id="closest-distances"></ul>
 
     <script>
@@ -25,49 +52,85 @@
         }
 
         // Example arrays of addresses (latitude and longitude)
-        const array1 = [
+        let array1 = [
             {"name": "New York", "latitude": 40.7128, "longitude": -74.0060},
             {"name": "Los Angeles", "latitude": 34.0522, "longitude": -118.2437},
             {"name": "London", "latitude": 51.5074, "longitude": -0.1278}
         ];
 
-        const array2 = [
+        let array2 = [
             {"name": "Calgary", "latitude": 51.0450, "longitude": -114.0579},
             {"name": "San Francisco", "latitude": 37.7749, "longitude": -122.4194},
             {"name": "Paris", "latitude": 48.8566, "longitude": 2.3522}
         ];
 
         // Find closest distance for each address in array1
-        const closestDistances = array1.map(address1 => {
-            let minDistance = Infinity;
-            let closestAddress = null;
+        function calculateClosestDistances() {
+            const closestDistances = array1.map(address1 => {
+                let minDistance = Infinity;
+                let closestAddress = null;
 
-            array2.forEach(address2 => {
-                const distance = haversineDistance(address1.latitude, address1.longitude, address2.latitude, address2.longitude);
-                if (distance < minDistance) {
-                    minDistance = distance;
-                    closestAddress = address2;
-                }
+                array2.forEach(address2 => {
+                    const distance = haversineDistance(address1.latitude, address1.longitude, address2.latitude, address2.longitude);
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        closestAddress = address2;
+                    }
+                });
+
+                return {
+                    address: address1,
+                    closestDistance: minDistance.toFixed(2),
+                    closestAddress: closestAddress
+                };
             });
 
-            return {
-                address: address1,
-                closestDistance: minDistance.toFixed(2),
-                closestAddress: closestAddress
-            };
+            // Display closest distances on the webpage
+            const closestDistancesList = document.getElementById('closest-distances');
+            closestDistancesList.innerHTML = ''; // Clear previous list
+            closestDistances.forEach(item => {
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `
+                    Address: ${item.address.name}<br>
+                    Closest Distance: ${item.closestDistance} km<br>
+                    Closest Address: ${item.closestAddress.name}<br>
+                `;
+                closestDistancesList.appendChild(listItem);
+            });
+        }
+
+        // Handle form submission for adding address to array 1
+        document.getElementById('add-address-array1').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const addressName = document.getElementById('address-name-array1').value.trim();
+            const latitude = parseFloat(document.getElementById('latitude-array1').value);
+            const longitude = parseFloat(document.getElementById('longitude-array1').value);
+
+            if (!isNaN(latitude) && !isNaN(longitude) && addressName !== '') {
+                array1.push({name: addressName, latitude: latitude, longitude: longitude});
+                calculateClosestDistances();
+            } else {
+                alert('Please enter valid values for latitude, longitude, and address name.');
+            }
         });
 
-        // Display closest distances on the webpage
-        const closestDistancesList = document.getElementById('closest-distances');
-        closestDistances.forEach(item => {
-            const listItem = document.createElement('li');
-            listItem.innerHTML = `
-                Address: ${item.address.name}<br>
-                Closest Distance: ${item.closestDistance} km<br>
-                Closest Address: ${item.closestAddress.name}<br>
-            `;
-            closestDistancesList.appendChild(listItem);
+        // Handle form submission for adding address to array 2
+        document.getElementById('add-address-array2').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const addressName = document.getElementById('address-name-array2').value.trim();
+            const latitude = parseFloat(document.getElementById('latitude-array2').value);
+            const longitude = parseFloat(document.getElementById('longitude-array2').value);
+
+            if (!isNaN(latitude) && !isNaN(longitude) && addressName !== '') {
+                array2.push({name: addressName, latitude: latitude, longitude: longitude});
+                calculateClosestDistances();
+            } else {
+                alert('Please enter valid values for latitude, longitude, and address name.');
+            }
         });
+
+        // Initial calculation and display of closest distances
+        calculateClosestDistances();
     </script>
 </body>
 </html>
